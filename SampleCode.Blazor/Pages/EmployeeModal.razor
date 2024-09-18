@@ -1,0 +1,84 @@
+﻿@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public Model.Employee Employee { get; set; }
+    [Parameter] public EventCallback<Model.Employee> OnSave { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    private Model.Employee _employee;
+
+    protected override void OnParametersSet()
+    {
+        if (Employee != null)
+        {
+            _employee = new Model.Employee
+                {
+                    Id = Employee.Id,
+                    FirstName = Employee.FirstName,
+                    LastName = Employee.LastName,
+                    Position = Employee.Position
+                    // Initialize other fields as necessary
+                };
+        }
+    }
+
+    private void Save()
+    {
+        OnSave.InvokeAsync(_employee);
+        CloseModal();
+    }
+
+    private void Cancel()
+    {
+        OnCancel.InvokeAsync();
+        CloseModal();
+    }
+
+    private void CloseModal()
+    {
+        IsVisible = false;
+        IsVisibleChanged.InvokeAsync(IsVisible);
+    }
+}
+
+@if (IsVisible)
+{
+    <div id="myModal" class="modal fade show d-block" tabindex="-1" role="dialog" style="display: block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Employee</h5>
+                    <button type="button" class="close" aria-label="Close" @onclick="CloseModal">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <EditForm Model="_employee" OnValidSubmit="Save">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <InputText id="firstName" class="form-control" @bind-Value="_employee.FirstName" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <InputText id="lastName" class="form-control" @bind-Value="_employee.LastName" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="position">Position</label>
+                            <InputText id="position" class="form-control" @bind-Value="_employee.Position" />
+                        </div>
+
+                        <!-- Add other fields as needed -->
+
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
