@@ -3,7 +3,7 @@
 namespace SampleCode.Blazor.Interfaces
 {
     public interface IEmployeeService
-    {
+    { 
         Task<List<Employee>> GetEmployeesAsync();
         Task<Employee> GetEmployeeByIdAsync(int id);
         Task AddEmployeeAsync(Employee employee);
